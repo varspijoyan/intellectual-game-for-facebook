@@ -1,0 +1,38 @@
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import db from "./db/connection.js";
+import { health } from "./controllers/healthController.js";
+import { createAdminRoutes } from "./routes/adminRoutes.js";
+import { createPlayerRoutes } from "./routes/playerRoutes.js";
+import { createFacebookRoutes } from "./routes/facebookRoutes.js";
+
+dotenv.config({ path: "./.env" });
+
+const app = express();
+const port = Number(process.env.PORT || 3000);
+
+app.use(helmet());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true,
+  }),
+);
+app.use(express.json());
+
+app.get("/health", health);
+app.use("/api", createPlayerRoutes(db));
+app.use("/api/facebook", createFacebookRoutes(db));
+app.use("/v1/admin", createAdminRoutes(db));
+
+app.use((_req, res) => res.status(404).json({ error: "Not found" }));
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal server error" });
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});

@@ -1,0 +1,38 @@
+import { Router } from "express";
+import { createAdminAuthController } from "../controllers/adminAuthController.js";
+import { createAdminContentController } from "../controllers/adminContentController.js";
+
+export function createAdminRoutes(db) {
+  const router = Router();
+  const admin = createAdminAuthController(db);
+  const content = createAdminContentController(db);
+
+  router.post("/auth/login", admin.login);
+  router.post("/auth/forgot-password", admin.forgotPassword);
+  router.post("/auth/reset-password", admin.resetPassword);
+  router.post("/auth/request-change-password-code", admin.adminGuard, admin.requestChangePasswordCode);
+  router.post("/auth/change-password", admin.adminGuard, admin.changePassword);
+
+  router.get("/me", admin.adminGuard, admin.me);
+
+  router.get("/locales", admin.adminGuard, content.listLocales);
+  router.post("/locales", admin.adminGuard, content.upsertLocale);
+
+  router.get("/countries", admin.adminGuard, content.listCountries);
+  router.post("/countries", admin.adminGuard, content.upsertCountry);
+
+  router.get("/teams", admin.adminGuard, content.listTeams);
+  router.post("/teams", admin.adminGuard, content.createTeam);
+
+  router.get("/athletes", admin.adminGuard, content.listAthletes);
+  router.post("/athletes", admin.adminGuard, content.createAthlete);
+
+  router.get("/position-labels", admin.adminGuard, content.listPositionLabels);
+  router.post("/position-labels", admin.adminGuard, content.upsertPositionLabel);
+
+  // Admin-editable question/answer language records.
+  router.get("/question-localizations", admin.adminGuard, content.listQuestionLocalizations);
+  router.post("/question-localizations", admin.adminGuard, content.upsertQuestionLocalization);
+
+  return router;
+}
