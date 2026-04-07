@@ -1,28 +1,25 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, ".env") });
+dotenv.config({ path: "./.env" });
 
-const connection = {
-  host: process.env.MYSQL_HOST ?? "127.0.0.1",
-  port: Number(process.env.MYSQL_PORT ?? 3306),
-  user: process.env.MYSQL_USER ?? "root",
-  password: process.env.MYSQL_PASSWORD ?? "",
-  database: process.env.MYSQL_DATABASE ?? "fb_soccer_quiz_game",
-};
-
-/** @type { import('knex').Knex.Config } */
-export default {
+const config = {
   client: "mysql2",
-  connection,
+  connection: {
+    host: process.env.MYSQL_HOST || "localhost",
+    port: Number(process.env.MYSQL_PORT || 3306),
+    user: process.env.MYSQL_USER || "root",
+    password: process.env.MYSQL_PASSWORD || "",
+    database: process.env.MYSQL_DATABASE || "fb_soccer_quiz_game",
+  },
   migrations: {
-    directory: "./migrations",
+    directory: "./db/migrations",
+    tableName: "knex_migrations",
     extension: "js",
   },
   seeds: {
-    directory: "./seeds",
+    directory: "./db/seeds",
     extension: "js",
   },
 };
+
+export default config;
