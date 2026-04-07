@@ -17,7 +17,7 @@ Monorepo: **Vite + TypeScript** Instant Games client, **Express + MySQL** API, s
 
 2. **Environment**
 
-   - Copy [`server/.env.example`](server/.env.example) to [`server/.env`](server/.env). Set `MYSQL_PASSWORD` and optional `META_APP_SECRET` (and `VITE_*` keys for the client).
+   - Create `server/.env` manually and set required keys: `MYSQL_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (plus optional `META_APP_SECRET` and `VITE_*` keys for the client).
 
 3. **Database**
 

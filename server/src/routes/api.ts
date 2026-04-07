@@ -1,18 +1,17 @@
 import { Router } from "express";
-import type { Env } from "../env.js";
-import type { Db } from "../db.js";
+import type { AppEnv, Db } from "../db.js";
 import { createAuthMiddleware } from "../middleware/auth.js";
 import * as matches from "../services/matches.js";
 
-export function createApiRouter(env: Env, db: Db) {
+export function createApiRouter(env: AppEnv, db: Db) {
   const auth = createAuthMiddleware(env, db);
   const r = Router();
 
-  r.get("/me", auth, (req, res) => {
+  r.get("/me", auth, (req: any, res: any) => {
     res.json({ playerId: req.fbPlayerId! });
   });
 
-  r.get("/matches", auth, async (req, res, next) => {
+  r.get("/matches", auth, async (req: any, res: any, next: any) => {
     try {
       const includeCompleted = req.query.includeCompleted === "1" || req.query.includeCompleted === "true";
       const list = await matches.listMatchesForPlayer(db, req.fbPlayerId!, {
@@ -24,7 +23,7 @@ export function createApiRouter(env: Env, db: Db) {
     }
   });
 
-  r.post("/matches/solo", auth, async (req, res, next) => {
+  r.post("/matches/solo", auth, async (req: any, res: any, next: any) => {
     try {
       const { matchId, question } = await matches.createSoloMatch(db, req.fbPlayerId!);
       res.status(201).json({ matchId, match: await matches.getMatchDto(db, matchId), question });
@@ -33,7 +32,7 @@ export function createApiRouter(env: Env, db: Db) {
     }
   });
 
-  r.post("/matches/async", auth, async (req, res, next) => {
+  r.post("/matches/async", auth, async (req: any, res: any, next: any) => {
     try {
       const contextId = typeof req.body?.contextId === "string" ? req.body.contextId : "";
       if (!contextId) {
@@ -47,7 +46,7 @@ export function createApiRouter(env: Env, db: Db) {
     }
   });
 
-  r.post("/matches/:id/join", auth, async (req, res, next) => {
+  r.post("/matches/:id/join", auth, async (req: any, res: any, next: any) => {
     try {
       const id = Number(req.params.id);
       if (!Number.isFinite(id)) {
@@ -66,7 +65,7 @@ export function createApiRouter(env: Env, db: Db) {
     }
   });
 
-  r.get("/matches/:id", auth, async (req, res, next) => {
+  r.get("/matches/:id", auth, async (req: any, res: any, next: any) => {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) {
       res.status(400).json({ error: "Invalid id" });
@@ -85,7 +84,7 @@ export function createApiRouter(env: Env, db: Db) {
     res.json(state);
   });
 
-  r.post("/matches/:id/answer", auth, async (req, res, next) => {
+  r.post("/matches/:id/answer", auth, async (req: any, res: any, next: any) => {
     try {
       const id = Number(req.params.id);
       const answerIndex = Number(req.body?.answerIndex);

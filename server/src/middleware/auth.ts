@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type { Env } from "../env.js";
-import type { Db } from "../db.js";
+import type { AppEnv, Db } from "../db.js";
 import { verifySignedPlayerInfo } from "../facebook/verifySignedPlayerInfo.js";
 
 declare global {
@@ -11,7 +10,7 @@ declare global {
   }
 }
 
-export function createAuthMiddleware(env: Env, _db: Db) {
+export function createAuthMiddleware(env: AppEnv, _db: Db) {
   return function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const bypass = env.DEV_AUTH_BYPASS === "1" && env.NODE_ENV !== "production";
     const devId = req.header("X-Dev-Player-Id");

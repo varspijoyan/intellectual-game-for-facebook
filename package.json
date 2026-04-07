@@ -4,13 +4,15 @@
   "workspaces": [
     "server",
     "client",
-    "shared"
+    "shared",
+    "client-admin"
   ],
   "scripts": {
-    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client && npm run build -w client-admin",
     "test": "npm run test -w server",
     "dev:server": "npm run dev -w server",
     "dev:client": "npm run dev -w client",
+    "dev:admin": "npm run dev -w client-admin",
     "db:create": "npm run db:create -w server",
     "migrate": "npm run migrate -w server",
     "migrate:latest": "npm run migrate:latest -w server",
