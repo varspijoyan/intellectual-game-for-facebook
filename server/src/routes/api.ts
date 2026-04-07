@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { AppEnv, Db } from "../db.js";
 import { createAuthMiddleware } from "../middleware/auth.js";
-import * as matches from "../services/matches.js";
+import * as matches from "../services/matches";
 
 export function createApiRouter(env: AppEnv, db: Db) {
   const auth = createAuthMiddleware(env, db);
