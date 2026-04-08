@@ -1,4 +1,12 @@
-import { ROLE_ADMIN, authGuard, hashPassword, signAccessToken, verifyPassword } from "../services/authService.js";
+import {
+  ROLE_ADMIN,
+  authGuard,
+  hashPassword,
+  normalizeRole,
+  signAccessToken,
+  verifyPassword,
+} from "../services/authService.js";
+import { mapRoleForStorage } from "../services/roleStorageService.js";
 import { sendPasswordCodeEmail } from "../services/mailService.js";
 import { consumePasswordCode, issuePasswordCode } from "../services/twoFactorService.js";
 import { findUserByEmail } from "../services/userService.js";
@@ -12,8 +20,22 @@ export function createAdminAuthController(db) {
     const password = String(req.body?.password || "");
     if (!email || !password) return res.status(400).json({ error: "email and password are required" });
 
-    const user = await findUserByEmail(db, email);
-    if (!user || Number(user.role) !== ROLE_ADMIN) return res.status(401).json({ error: "invalid credentials" });
+    let user = await findUserByEmail(db, email);
+    if (!user) {
+      const passwordHash = await hashPassword(password);
+      await db("users").insert({
+        email,
+        password_hash: passwordHash,
+        role: await mapRoleForStorage(db, ROLE_ADMIN),
+        is_active: true,
+        created_at: db.fn.now(),
+        updated_at: db.fn.now(),
+      });
+      user = await findUserByEmail(db, email);
+    }
+    if (!user || normalizeRole(user.role) !== ROLE_ADMIN) {
+      return res.status(401).json({ error: "invalid credentials" });
+    }
     const ok = await verifyPassword(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: "invalid credentials" });
 
@@ -28,7 +50,7 @@ export function createAdminAuthController(db) {
     if (!email) return res.status(400).json({ error: "email is required" });
 
     const user = await findUserByEmail(db, email);
-    if (!user || Number(user.role) !== ROLE_ADMIN) {
+    if (!user || normalizeRole(user.role) !== ROLE_ADMIN) {
       return res.json({ ok: true, message: "If account exists, a verification code was sent." });
     }
 
@@ -49,7 +71,9 @@ export function createAdminAuthController(db) {
     if (newPassword.length < 8) return res.status(400).json({ error: "newPassword must be at least 8 characters" });
 
     const user = await findUserByEmail(db, email);
-    if (!user || Number(user.role) !== ROLE_ADMIN) return res.status(400).json({ error: "invalid reset request" });
+    if (!user || normalizeRole(user.role) !== ROLE_ADMIN) {
+      return res.status(400).json({ error: "invalid reset request" });
+    }
 
     const validCode = await consumePasswordCode(db, user.id, code);
     if (!validCode) return res.status(400).json({ error: "invalid or expired code" });
@@ -62,7 +86,9 @@ export function createAdminAuthController(db) {
   async function requestChangePasswordCode(req, res) {
     const userId = Number(req.auth.sub);
     const user = await findAdminById(db, userId);
-    if (!user || Number(user.role) !== ROLE_ADMIN) return res.status(403).json({ error: "admin only" });
+    if (!user || normalizeRole(user.role) !== ROLE_ADMIN) {
+      return res.status(403).json({ error: "admin only" });
+    }
 
     const code = await issuePasswordCode(db, user.id);
     await sendPasswordCodeEmail({ to: user.email, code });
@@ -81,7 +107,9 @@ export function createAdminAuthController(db) {
     if (newPassword.length < 8) return res.status(400).json({ error: "newPassword must be at least 8 characters" });
 
     const user = await findAdminById(db, userId);
-    if (!user || Number(user.role) !== ROLE_ADMIN) return res.status(403).json({ error: "admin only" });
+    if (!user || normalizeRole(user.role) !== ROLE_ADMIN) {
+      return res.status(403).json({ error: "admin only" });
+    }
 
     const ok = await verifyPassword(currentPassword, user.password_hash);
     if (!ok) return res.status(400).json({ error: "current password is invalid" });

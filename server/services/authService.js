@@ -1,10 +1,19 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-export const ROLE_ADMIN = 1;
-export const ROLE_PLAYER = 2;
+export const ROLE_ADMIN = "admin";
+export const ROLE_PLAYER = "player";
 
 const TOKEN_TYPE = "Bearer";
+
+export function normalizeRole(role) {
+  const value = String(role ?? "")
+    .trim()
+    .toLowerCase();
+  if (value === "1" || value === ROLE_ADMIN) return ROLE_ADMIN;
+  if (value === "2" || value === ROLE_PLAYER) return ROLE_PLAYER;
+  return value;
+}
 
 export function signAccessToken(user) {
   const secret = process.env.JWT_SECRET;
@@ -12,7 +21,7 @@ export function signAccessToken(user) {
   return jwt.sign(
     {
       sub: user.id,
-      role: user.role,
+      role: normalizeRole(user.role),
       email: user.email,
     },
     secret,
@@ -47,7 +56,7 @@ export function authGuard(requiredRole = null) {
       const payload = jwt.verify(token, secret);
       req.auth = payload;
 
-      if (requiredRole && Number(payload.role) !== Number(requiredRole)) {
+      if (requiredRole && normalizeRole(payload.role) !== normalizeRole(requiredRole)) {
         return res.status(403).json({ error: "Forbidden for this role" });
       }
       return next();

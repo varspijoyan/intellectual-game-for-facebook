@@ -1,4 +1,4 @@
-import { authGuard, signAccessToken } from "../services/authService.js";
+import { ROLE_PLAYER, authGuard, signAccessToken } from "../services/authService.js";
 import { getFacebookFriends, verifySignedPlayerInfo } from "../services/facebookService.js";
 import { ensureFacebookPlayer, findUserById } from "../services/facebookAuthService.js";
 

@@ -1,4 +1,10 @@
-import { hashPassword, signAccessToken, verifyPassword } from "../services/authService.js";
+import {
+  ROLE_PLAYER,
+  hashPassword,
+  normalizeRole,
+  signAccessToken,
+  verifyPassword,
+} from "../services/authService.js";
 import { createPlayerUser, findPlayerByUserId, findUserByEmail, findUserById } from "../services/userService.js";
 
 export function createPlayerAuthController(db) {
@@ -31,7 +37,9 @@ export function createPlayerAuthController(db) {
     if (!email || !password) return res.status(400).json({ error: "email and password are required" });
 
     const user = await findUserByEmail(db, email);
-    if (!user || !user.is_active) return res.status(401).json({ error: "invalid credentials" });
+    if (!user || normalizeRole(user.role) !== ROLE_PLAYER || !user.is_active) {
+      return res.status(401).json({ error: "invalid credentials" });
+    }
     const ok = await verifyPassword(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: "invalid credentials" });
 

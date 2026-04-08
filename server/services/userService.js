@@ -1,4 +1,5 @@
 import { ROLE_PLAYER } from "./authService.js";
+import { mapRoleForStorage } from "./roleStorageService.js";
 
 export function findUserByEmail(db, email) {
   return db("users").where({ email: String(email).toLowerCase() }).first();
@@ -16,7 +17,7 @@ export async function createPlayerUser(db, { email, passwordHash, displayName, l
   const [userId] = await db("users").insert({
     email: String(email).toLowerCase(),
     password_hash: passwordHash,
-    role: ROLE_PLAYER,
+    role: await mapRoleForStorage(db, ROLE_PLAYER),
     is_active: true,
     created_at: db.fn.now(),
     updated_at: db.fn.now(),

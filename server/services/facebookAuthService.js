@@ -1,4 +1,5 @@
 import { ROLE_PLAYER } from "./authService.js";
+import { mapRoleForStorage } from "./roleStorageService.js";
 
 export function findPlayerByFacebookPlayerId(db, fbPlayerId) {
   return db("players").where({ fb_player_id: fbPlayerId }).first();
@@ -21,7 +22,7 @@ export async function ensureFacebookPlayer(db, fbPlayerId) {
     const [newUserId] = await db("users").insert({
       email: `fb_${fbPlayerId}@facebook.local`,
       password_hash: "facebook_oauth_no_password",
-      role: ROLE_PLAYER,
+      role: await mapRoleForStorage(db, ROLE_PLAYER),
       is_active: true,
       created_at: db.fn.now(),
       updated_at: db.fn.now(),

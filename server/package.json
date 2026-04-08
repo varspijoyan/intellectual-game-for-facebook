@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch index.js",
+    "dev": "npm run migrate && node --watch index.js",
     "start": "node index.js",
     "migrate:make": "knex migrate:make",
     "migrate": "knex migrate:latest --knexfile knexfile.js",

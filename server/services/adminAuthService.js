@@ -1,9 +1,17 @@
+import { ROLE_ADMIN } from "./authService.js";
+
 export function findAdminByEmail(db, email) {
-  return db("users").where({ email }).andWhere({ role: 1 }).first();
+  return db("users")
+    .where({ email })
+    .whereIn("role", [ROLE_ADMIN, 1, "1"])
+    .first();
 }
 
 export function findAdminById(db, id) {
-  return db("users").where({ id }).andWhere({ role: 1 }).first();
+  return db("users")
+    .where({ id })
+    .whereIn("role", [ROLE_ADMIN, 1, "1"])
+    .first();
 }
 
 export async function updateUserPasswordHash(db, userId, passwordHash) {
@@ -18,6 +26,7 @@ export async function updateUserPasswordHash(db, userId, passwordHash) {
 export function getAdminProfileById(db, userId) {
   return db("users")
     .select("id", "email", "role", "created_at", "updated_at")
-    .where({ id: userId, role: 1 })
+    .where({ id: userId })
+    .whereIn("role", [ROLE_ADMIN, 1, "1"])
     .first();
 }
