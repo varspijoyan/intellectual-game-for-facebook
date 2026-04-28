@@ -31,6 +31,7 @@ export default function TeamDetailPage() {
   if (!team) return <section className="panel">{error ?? "Team not found."}</section>;
 
   async function onSave() {
+    if (!team) return;
     setSaving(true);
     setError(null);
     try {
