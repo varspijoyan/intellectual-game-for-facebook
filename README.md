@@ -32,6 +32,8 @@ Monorepo: **Vite + TypeScript** Instant Games client, **Express + MySQL** API, s
    ```bash
    npm run dev:server
    npm run dev:client
+   npm run dev:admin
+   npm run dev:all
    ```
 
    Open the Vite URL (default `http://127.0.0.1:5173`). With `DEV_AUTH_BYPASS=1` in `server/.env`, the client sends `X-Dev-Player-Id` so you can test outside Facebook.

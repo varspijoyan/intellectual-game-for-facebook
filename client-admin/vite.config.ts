@@ -6,5 +6,11 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
+    proxy: {
+      "/v1/admin": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
   },
 });

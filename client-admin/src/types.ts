@@ -49,3 +49,16 @@ export type Athlete = {
   localizations: AthleteLocalization[];
   photos: AthletePhoto[];
 };
+
+export type Position = {
+  id: string;
+  code: string;
+  label: string;
+};
+
+export type Template = {
+  id: string;
+  name: string;
+  prompt: string;
+  active: boolean;
+};
