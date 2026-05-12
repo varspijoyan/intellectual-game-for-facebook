@@ -18,8 +18,8 @@ export function createAdminRoutes(db) {
   router.get("/locales", admin.adminGuard, content.listLocales);
   router.post("/locales", admin.adminGuard, content.upsertLocale);
 
-  router.get("/countries", admin.adminGuard, content.listCountries);
-  router.post("/countries", admin.adminGuard, content.upsertCountry);
+  router.get("/countries/localizations", admin.adminGuard, content.listCountries);
+  router.post("/countries/localizations", admin.adminGuard, content.upsertCountry);
 
   router.get("/teams", admin.adminGuard, content.listTeams);
   router.post("/teams", admin.adminGuard, content.createTeam);
